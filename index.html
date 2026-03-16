@@ -916,7 +916,12 @@
             window.scrollTo(0, 0);
         }
 
-        function answer(sec, idx, val) { state.answers[sec][idx] = val; render(); }
+        function answer(sec, idx, val) {
+            state.answers[sec][idx] = val;
+            const scrollY = window.scrollY;
+            render();
+            window.scrollTo(0, scrollY);
+        }
         function nextSection() { if (state.section < SECTIONS.length - 1) { state.section++; render(); } }
         function prevSection() { if (state.section > 0) { state.section--; render(); } }
         function restartApp() { state = { section: 0, answers: { proqol: {}, mbi: {}, dass: {} } }; render(); }
