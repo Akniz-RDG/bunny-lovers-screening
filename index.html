@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tamizaje de Salud Mental — Bunny Lovers</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Lato:wght@300;400;700&display=swap');
+
+        :root {
+            --sage: #8aaa8a;
+            --sage-light: #c8dcc8;
+            --sage-bg: #eef4ee;
+            --terracota: #a0584a;
+            --terracota-light: #d4907f;
+            --terracota-pale: #f5ede8;
+            --cream: #faf7f2;
+            --warm-gray: #7a7570;
+            --dark: #2e2a26;
+            --border: rgba(138, 170, 138, 0.3);
+            --radius: 14px;
+            --radius-sm: 8px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--cream);
+            min-height: 100vh;
+        }
+
+        #app {
+            font-family: 'Lato', sans-serif;
+            background: var(--cream);
+            min-height: 100vh;
+            color: var(--dark);
+            padding: 0 0 60px;
+            max-width: 680px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: var(--sage-bg);
+            border-bottom: 1.5px solid var(--sage-light);
+            padding: 28px 24px 20px;
+            text-align: center;
+        }
+
+        .header-logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            font-weight: 500;
+            color: var(--terracota);
+            letter-spacing: 0.01em;
+        }
+
+        .header p {
+            font-size: 13px;
+            color: var(--warm-gray);
+            margin-top: 6px;
+            line-height: 1.5;
+        }
+
+        .progress-bar-wrap {
+            background: var(--sage-bg);
+            padding: 12px 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--warm-gray);
+            margin-bottom: 6px;
+        }
+
+        .progress-track {
+            height: 5px;
+            background: var(--sage-light);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--terracota);
+            border-radius: 10px;
+            transition: width 0.4s ease;
+        }
+
+        .section-header {
+            padding: 24px 24px 8px;
+            border-top: 2px solid var(--sage-light);
+            margin-top: 8px;
+        }
+
+        .section-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--sage);
+            margin-bottom: 4px;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--terracota);
+        }
+
+        .section-desc {
+            font-size: 13px;
+            color: var(--warm-gray);
+            margin-top: 6px;
+            line-height: 1.6;
+            padding: 0 24px;
+        }
+
+        .question-card {
+            margin: 10px 16px;
+            background: white;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            padding: 16px 18px;
+        }
+
+        .question-num {
+            font-size: 11px;
+            color: var(--terracota-light);
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .question-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--dark);
+            margin-bottom: 14px;
+        }
+
+        .options-row {
+            display: grid;
+            gap: 6px;
+        }
+
+        .opt-btn {
+            background: var(--sage-bg);
+            border: 1.5px solid transparent;
+            border-radius: var(--radius-sm);
+            padding: 9px 14px;
+            font-size: 13px;
+            color: var(--dark);
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.15s;
+            font-family: 'Lato', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .opt-btn:hover {
+            background: var(--sage-light);
+            border-color: var(--sage);
+        }
+
+        .opt-btn.selected {
+            background: var(--terracota-pale);
+            border-color: var(--terracota);
+            color: var(--terracota);
+            font-weight: 700;
+        }
+
+        .opt-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 1.5px solid var(--sage);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .opt-btn.selected .opt-dot {
+            background: var(--terracota);
+            border-color: var(--terracota);
+        }
+
+        .opt-btn.selected .opt-dot::after {
+            content: '';
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: white;
+        }
+
+        .nav-btns {
+            display: flex;
+            gap: 10px;
+            padding: 20px 16px 8px;
+            justify-content: flex-end;
+        }
+
+        .btn-secondary {
+            padding: 11px 22px;
+            border: 1.5px solid var(--sage);
+            background: transparent;
+            border-radius: 30px;
+            font-size: 14px;
+            color: var(--sage);
+            cursor: pointer;
+            font-family: 'Lato', sans-serif;
+            transition: all 0.15s;
+        }
+
+        .btn-secondary:hover {
+            background: var(--sage-bg);
+        }
+
+        .btn-primary {
+            padding: 11px 26px;
+            border: none;
+            background: var(--terracota);
+            border-radius: 30px;
+            font-size: 14px;
+            color: white;
+            cursor: pointer;
+            font-family: 'Lato', sans-serif;
+            font-weight: 700;
+            transition: all 0.15s;
+        }
+
+        .btn-primary:hover {
+            background: #8c4a3d;
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.4;
+            cursor: default;
+        }
+
+        .warning-box {
+            margin: 8px 16px;
+            background: #fff8f5;
+            border: 1px solid #e8c4b5;
+            border-radius: var(--radius-sm);
+            padding: 10px 14px;
+            font-size: 12px;
+            color: #8c5040;
+            line-height: 1.5;
+        }
+
+        .results-wrap {
+            padding: 20px 16px;
+        }
+
+        .results-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            color: var(--terracota);
+            margin-bottom: 6px;
+            font-style: italic;
+        }
+
+        .results-intro {
+            font-size: 13px;
+            color: var(--warm-gray);
+            line-height: 1.6;
+            margin-bottom: 18px;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            padding: 16px 18px;
+            margin-bottom: 12px;
+        }
+
+        .result-card-title {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--warm-gray);
+            margin-bottom: 4px;
+        }
+
+        .result-sub {
+            font-family: 'Playfair Display', serif;
+            font-size: 16px;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .score-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .score-label {
+            font-size: 12px;
+            color: var(--warm-gray);
+            flex: 0 0 160px;
+        }
+
+        .score-bar-wrap {
+            flex: 1;
+            height: 8px;
+            background: var(--sage-bg);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .score-bar {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.6s ease;
+        }
+
+        .bar-green {
+            background: #6aab6a;
+        }
+
+        .bar-amber {
+            background: #d4a055;
+        }
+
+        .bar-red {
+            background: #c05040;
+        }
+
+        .score-val {
+            font-size: 13px;
+            font-weight: 700;
+            min-width: 36px;
+            text-align: right;
+        }
+
+        .risk-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+
+        .badge-ok {
+            background: #e8f4e8;
+            color: #3a7a3a;
+        }
+
+        .badge-mod {
+            background: #fdf0e0;
+            color: #9a6020;
+        }
+
+        .badge-high {
+            background: #fbe8e8;
+            color: #9a3030;
+        }
+
+        .alert-card {
+            background: var(--terracota-pale);
+            border: 1.5px solid var(--terracota-light);
+            border-radius: var(--radius);
+            padding: 18px 20px;
+            margin: 12px 0;
+        }
+
+        .alert-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 16px;
+            color: var(--terracota);
+            margin-bottom: 8px;
+        }
+
+        .alert-text {
+            font-size: 13px;
+            color: #6a3c30;
+            line-height: 1.6;
+            margin-bottom: 14px;
+        }
+
+        .btn-encuadrado {
+            display: inline-block;
+            padding: 12px 24px;
+            background: var(--terracota);
+            color: white;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            font-family: 'Lato', sans-serif;
+            transition: background 0.15s;
+        }
+
+        .btn-encuadrado:hover {
+            background: #8c4a3d;
+        }
+
+        .ok-card {
+            background: #f0f8f0;
+            border: 1.5px solid #a8d4a8;
+            border-radius: var(--radius);
+            padding: 18px 20px;
+            margin: 12px 0;
+        }
+
+        .ok-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 16px;
+            color: #3a6a3a;
+            margin-bottom: 8px;
+        }
+
+        .ok-text {
+            font-size: 13px;
+            color: #3a5a3a;
+            line-height: 1.6;
+        }
+
+        .disclaimer {
+            margin: 16px 0 0;
+            font-size: 11px;
+            color: var(--warm-gray);
+            line-height: 1.6;
+            padding: 12px 14px;
+            background: var(--sage-bg);
+            border-radius: var(--radius-sm);
+            border-left: 3px solid var(--sage-light);
+        }
+
+        .btn-restart {
+            margin-top: 16px;
+            padding: 10px 22px;
+            border: 1.5px solid var(--warm-gray);
+            background: transparent;
+            border-radius: 30px;
+            font-size: 13px;
+            color: var(--warm-gray);
+            cursor: pointer;
+            font-family: 'Lato', sans-serif;
+            transition: all 0.15s;
+        }
+
+        .btn-restart:hover {
+            border-color: var(--terracota);
+            color: var(--terracota);
+        }
+
+        .scale-hint {
+            font-size: 11px;
+            color: var(--warm-gray);
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+
+        .intro-card {
+            margin: 16px;
+            background: white;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            padding: 22px 20px;
+            text-align: center;
+        }
+
+        .intro-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 19px;
+            color: var(--terracota);
+            margin-bottom: 10px;
+        }
+
+        .intro-text {
+            font-size: 13px;
+            color: var(--warm-gray);
+            line-height: 1.7;
+            margin-bottom: 18px;
+        }
+
+        .instruments-row {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        .instr-pill {
+            background: var(--sage-bg);
+            border: 1px solid var(--sage-light);
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: 12px;
+            color: var(--sage);
+            font-weight: 700;
+        }
+
+        .time-note {
+            font-size: 12px;
+            color: var(--warm-gray);
+            margin-bottom: 20px;
+        }
+
+        .bunny-svg {
+            margin: 0 auto 16px;
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div class="header">
+            <div class="header-logo">
+                <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <ellipse cx="18" cy="22" rx="10" ry="8" fill="#c8dcc8" />
+                    <ellipse cx="13" cy="11" rx="3" ry="7" fill="#c8dcc8" />
+                    <ellipse cx="23" cy="11" rx="3" ry="7" fill="#c8dcc8" />
+                    <ellipse cx="13" cy="10" rx="1.5" ry="5" fill="#f5ede8" />
+                    <ellipse cx="23" cy="10" rx="1.5" ry="5" fill="#f5ede8" />
+                    <ellipse cx="18" cy="22" rx="7" ry="5.5" fill="#deeade" />
+                    <circle cx="15.5" cy="20.5" r="1.2" fill="#2e2a26" />
+                    <circle cx="20.5" cy="20.5" r="1.2" fill="#2e2a26" />
+                    <ellipse cx="18" cy="23" rx="1.5" ry="1" fill="#a0584a" opacity="0.6" />
+                </svg>
+                <span style="font-family:'Playfair Display',serif;font-size:16px;color:#a0584a;font-weight:500;">Bunny
+                    Lovers</span>
+            </div>
+            <h1>Tamizaje de Salud Mental</h1>
+            <p>Para tutores, voluntarios y equipo de la fundación</p>
+        </div>
+        <div id="main-content"></div>
+    </div>
+
+    <script>
+        const PROQOL_ITEMS = [
+            { q: "Soy feliz." },
+            { q: "Me preocupo por las personas que atiendo." },
+            { q: "Me siento satisfecho/a por poder ayudar a los animales y personas de la fundación." },
+            { q: "Me siento conectado/a con los demás." },
+            { q: "Saltos o flashbacks de situaciones perturbadoras que he presenciado (p. ej., animales abandonados, sufrimiento)." },
+            { q: "Me siento animado/a cuando pienso en quienes ayudo." },
+            { q: "Creo que podría sentirme abrumado/a por el trauma de las personas o animales que ayudo." },
+            { q: "Siento satisfacción por mi labor en la fundación." },
+            { q: "Me siento 'atrapado/a' por mi trabajo en la fundación." },
+            { q: "Creo que he sido 'contaminado/a' por el estrés traumático de quienes ayudo." },
+        ];
+
+        const PROQOL_SCALE = [
+            { v: 1, l: "Nunca" },
+            { v: 2, l: "Raramente" },
+            { v: 3, l: "A veces" },
+            { v: 4, l: "A menudo" },
+            { v: 5, l: "Muy frecuente" },
+        ];
+
+        const MBI_ITEMS = [
+            { q: "Me siento emocionalmente agotado/a por mi trabajo en la fundación.", sub: "AE" },
+            { q: "Me siento agotado/a al final de la jornada.", sub: "AE" },
+            { q: "Me siento cansado/a cuando me levanto por la mañana y tengo que enfrentarme a un nuevo día.", sub: "AE" },
+            { q: "Me parece que trabajar con animales o personas en crisis me cansa.", sub: "AE" },
+            { q: "Me siento 'quemado/a' por mi trabajo voluntario o en la fundación.", sub: "AE" },
+            { q: "Me siento frustrado/a en mi trabajo.", sub: "AE" },
+            { q: "Siento que estoy trabajando demasiado.", sub: "AE" },
+            { q: "Trabajar directamente con personas o animales me produce estrés.", sub: "AE" },
+            { q: "Me siento al límite de mis posibilidades.", sub: "AE" },
+            { q: "Creo que trato a algunas personas como si fueran objetos impersonales.", sub: "DP" },
+            { q: "Me he vuelto más insensible con las personas desde que realizo este trabajo.", sub: "DP" },
+            { q: "Me preocupa que este trabajo me esté endureciendo emocionalmente.", sub: "DP" },
+            { q: "Realmente no me importa lo que les pasa a algunos animales o personas que atiendo.", sub: "DP" },
+            { q: "Siento que algunas personas de la fundación me culpan por sus problemas.", sub: "DP" },
+            { q: "Puedo entender fácilmente cómo se sienten quienes atiendo.", sub: "RP", inv: true },
+            { q: "Trato muy eficazmente los problemas de quienes atiendo.", sub: "RP", inv: true },
+            { q: "Creo que influyo positivamente con mi trabajo.", sub: "RP", inv: true },
+            { q: "Me siento muy activo/a.", sub: "RP", inv: true },
+            { q: "Puedo crear fácilmente una atmósfera relajada con quienes trabajo.", sub: "RP", inv: true },
+            { q: "Me siento estimulado/a tras trabajar con quienes atiendo.", sub: "RP", inv: true },
+            { q: "He conseguido muchas cosas valiosas en este trabajo.", sub: "RP", inv: true },
+            { q: "Siento que en mi trabajo trato los problemas emocionales con mucha calma.", sub: "RP", inv: true },
+        ];
+
+        const MBI_SCALE = [
+            { v: 0, l: "Nunca" },
+            { v: 1, l: "Pocas veces al año" },
+            { v: 2, l: "Una vez al mes" },
+            { v: 3, l: "Pocas veces al mes" },
+            { v: 4, l: "Una vez a la semana" },
+            { v: 5, l: "Pocas veces a la semana" },
+            { v: 6, l: "Todos los días" },
+        ];
+
+        const DASS_ITEMS = [
+            { q: "Me costó mucho relajarme.", sub: "S" },
+            { q: "Me di cuenta que tenía la boca seca.", sub: "A" },
+            { q: "No podía sentir ningún sentimiento positivo.", sub: "D" },
+            { q: "Tuve dificultad en respirar (p.ej. respiración excesivamente rápida, falta de aire sin haber hecho esfuerzo físico).", sub: "A" },
+            { q: "Me resultó difícil tener iniciativa para hacer cosas.", sub: "D" },
+            { q: "Reaccioné de manera exagerada a ciertas situaciones.", sub: "S" },
+            { q: "Noté temblores (p.ej. en las manos).", sub: "A" },
+            { q: "Sentí que estaba muy nervioso/a.", sub: "S" },
+            { q: "Me preocupé por situaciones en las que podía entrar en pánico y hacer el ridículo.", sub: "A" },
+            { q: "Sentí que no había nada que me ilusionara.", sub: "D" },
+            { q: "Me sentí agitado/a.", sub: "S" },
+            { q: "Me resultó difícil relajarme.", sub: "S" },
+            { q: "Me sentí desanimado/a y triste.", sub: "D" },
+            { q: "No toleré nada que me impidiera continuar con lo que estaba haciendo.", sub: "S" },
+            { q: "Sentí que estaba a punto de entrar en pánico.", sub: "A" },
+            { q: "Fui incapaz de sentir entusiasmo por las cosas.", sub: "D" },
+            { q: "Sentí que valía poco como persona.", sub: "D" },
+            { q: "Sentí que estaba bastante irritable.", sub: "S" },
+            { q: "Sentí los latidos de mi corazón a pesar de no haber hecho ningún esfuerzo físico.", sub: "A" },
+            { q: "Tuve miedo sin razón aparente.", sub: "A" },
+            { q: "Sentí que la vida no tenía ningún sentido.", sub: "D" },
+        ];
+
+        const DASS_SCALE = [
+            { v: 0, l: "No me ocurrió" },
+            { v: 1, l: "Me ocurrió un poco" },
+            { v: 2, l: "Me ocurrió bastante" },
+            { v: 3, l: "Me ocurrió mucho" },
+        ];
+
+        const SECTIONS = [
+            { id: 'intro', type: 'intro' },
+            { id: 'proqol', type: 'instrument', label: 'Instrumento 1 de 3', title: 'Calidad de Vida Profesional', desc: 'Las siguientes preguntas se refieren a tus experiencias en la última semana en tu rol dentro de Bunny Lovers.', items: PROQOL_ITEMS, scale: PROQOL_SCALE },
+            { id: 'mbi', type: 'instrument', label: 'Instrumento 2 de 3', title: 'Inventario de Burnout', desc: 'Indica con qué frecuencia sientes cada una de las siguientes situaciones respecto a tu trabajo en la fundación.', items: MBI_ITEMS, scale: MBI_SCALE },
+            { id: 'dass', type: 'instrument', label: 'Instrumento 3 de 3', title: 'Bienestar Emocional (DASS-21)', desc: 'Indica en qué medida las siguientes experiencias se aplicaron a ti durante la última semana.', items: DASS_ITEMS, scale: DASS_SCALE },
+            { id: 'results', type: 'results' },
+        ];
+
+        let state = { section: 0, answers: { proqol: {}, mbi: {}, dass: {} } };
+
+        function totalQuestions() { return PROQOL_ITEMS.length + MBI_ITEMS.length + DASS_ITEMS.length; }
+
+        function answeredCount() {
+            let c = 0;
+            ['proqol', 'mbi', 'dass'].forEach(k => Object.values(state.answers[k]).forEach(v => { if (v !== undefined) c++; }));
+            return c;
+        }
+
+        function getProgress() {
+            if (state.section === 0) return 0;
+            if (state.section === SECTIONS.length - 1) return 100;
+            return Math.round((answeredCount() / totalQuestions()) * 100);
+        }
+
+        function scoreProQOL() {
+            const a = state.answers.proqol;
+            const cs = [0, 1, 2, 3, 5, 7].reduce((s, i) => s + (a[i] || 0), 0);
+            const bo = [8, 9].reduce((s, i) => s + (a[i] || 0), 0);
+            const sts = [4, 6].reduce((s, i) => s + (a[i] || 0), 0);
+            return {
+                cs: Math.round(cs / 30 * 100),
+                bo: Math.round(bo / 10 * 100),
+                sts: Math.round(sts / 10 * 100),
+                csRaw: cs, boRaw: bo, stsRaw: sts
+            };
+        }
+
+        function scoreMBI() {
+            const a = state.answers.mbi;
+            let ae = 0, dp = 0, rp = 0, aeN = 0, dpN = 0, rpN = 0;
+            MBI_ITEMS.forEach((item, i) => {
+                const v = a[i] || 0;
+                if (item.sub === 'AE') { ae += v; aeN++; }
+                else if (item.sub === 'DP') { dp += v; dpN++; }
+                else { rp += v; rpN++; }
+            });
+            const aeAvg = aeN ? ae / aeN : 0, dpAvg = dpN ? dp / dpN : 0, rpAvg = rpN ? rp / rpN : 0;
+            return {
+                ae: Math.round(aeAvg * 100 / 6),
+                dp: Math.round(dpAvg * 100 / 6),
+                rp: Math.round((1 - rpAvg / 6) * 100),
+                aeRisk: aeAvg > 3.2 ? 'alto' : aeAvg > 1.5 ? 'moderado' : 'bajo',
+                dpRisk: dpAvg > 1.5 ? 'alto' : dpAvg > 0.6 ? 'moderado' : 'bajo',
+                rpRisk: rpAvg < 3.7 ? 'alto' : rpAvg < 4.5 ? 'moderado' : 'bajo',
+                aeRaw: Math.round(aeAvg * 10) / 10,
+                dpRaw: Math.round(dpAvg * 10) / 10,
+                rpRaw: Math.round(rpAvg * 10) / 10,
+            };
+        }
+
+        function scoreDASS() {
+            const a = state.answers.dass;
+            let d = 0, an = 0, s = 0;
+            DASS_ITEMS.forEach((item, i) => {
+                const v = (a[i] || 0) * 2;
+                if (item.sub === 'D') d += v;
+                else if (item.sub === 'A') an += v;
+                else s += v;
+            });
+            const lvl = (v, cuts) => v >= cuts[3] ? 'severo' : v >= cuts[2] ? 'moderado-severo' : v >= cuts[1] ? 'moderado' : v >= cuts[0] ? 'leve' : 'normal';
+            return {
+                d: Math.round(d / 42 * 100),
+                an: Math.round(an / 42 * 100),
+                s: Math.round(s / 42 * 100),
+                dRisk: lvl(d, [10, 14, 21, 28]),
+                anRisk: lvl(an, [8, 10, 15, 20]),
+                sRisk: lvl(s, [15, 19, 26, 34]),
+                dRaw: d, anRaw: an, sRaw: s,
+            };
+        }
+
+        function hasRisk() {
+            const mbi = scoreMBI(), dass = scoreDASS(), pq = scoreProQOL();
+            const riskLevels = ['moderado', 'moderado-severo', 'severo'];
+            return mbi.aeRisk === 'alto' || mbi.dpRisk === 'alto' || mbi.rpRisk === 'alto' ||
+                riskLevels.includes(dass.dRisk) || riskLevels.includes(dass.anRisk) || riskLevels.includes(dass.sRisk) ||
+                pq.bo > 60 || pq.sts > 60;
+        }
+
+        function riskColor(l) {
+            if (['bajo', 'normal'].includes(l)) return 'bar-green';
+            if (l === 'leve' || l === 'moderado') return 'bar-amber';
+            return 'bar-red';
+        }
+
+        function riskBadge(l) {
+            if (['bajo', 'normal'].includes(l)) return '<span class="risk-badge badge-ok">Normal</span>';
+            if (l === 'leve' || l === 'moderado') return '<span class="risk-badge badge-mod">Atención</span>';
+            return '<span class="risk-badge badge-high">Elevado</span>';
+        }
+
+        function renderIntro() {
+            return `
+  <div class="intro-card">
+    <svg class="bunny-svg" width="70" height="60" viewBox="0 0 70 60" fill="none">
+      <ellipse cx="35" cy="42" rx="20" ry="15" fill="#c8dcc8"/>
+      <ellipse cx="23" cy="18" rx="5.5" ry="13" fill="#c8dcc8"/>
+      <ellipse cx="47" cy="18" rx="5.5" ry="13" fill="#c8dcc8"/>
+      <ellipse cx="23" cy="17" rx="3" ry="10" fill="#f5ede8"/>
+      <ellipse cx="47" cy="17" rx="3" ry="10" fill="#f5ede8"/>
+      <ellipse cx="35" cy="42" rx="14" ry="10" fill="#deeade"/>
+      <circle cx="30" cy="39" r="2" fill="#2e2a26"/>
+      <circle cx="40" cy="39" r="2" fill="#2e2a26"/>
+      <ellipse cx="35" cy="43" rx="2.5" ry="1.5" fill="#a0584a" opacity="0.5"/>
+      <path d="M25 48 Q35 54 45 48" stroke="#8aaa8a" stroke-width="1.5" fill="none"/>
+    </svg>
+    <p class="intro-title">Cuida tu bienestar para cuidar mejor</p>
+    <p class="intro-text">Este tamizaje es confidencial y voluntario. Nos ayuda a entender cómo estás y orientarte al apoyo más adecuado. Responde con honestidad: no hay respuestas correctas o incorrectas.</p>
+    <div class="instruments-row">
+      <span class="instr-pill">ProQOL</span>
+      <span class="instr-pill">Burnout MBI</span>
+      <span class="instr-pill">DASS-21</span>
+    </div>
+    <p class="time-note">Tiempo estimado: 10–15 minutos &bull; 53 preguntas en total</p>
+    <button class="btn-primary" onclick="nextSection()">Comenzar tamizaje</button>
+  </div>
+  <div class="warning-box">
+    Este instrumento es de orientación, no de diagnóstico. Si estás en crisis ahora mismo, comunícate con SAMU (131) o Salud Responde (600 360 7777).
+  </div>`;
+        }
+
+        function renderInstrument(sec) {
+            const ans = state.answers[sec.id];
+            let html = `
+  <div class="section-header">
+    <div class="section-label">${sec.label}</div>
+    <div class="section-title">${sec.title}</div>
+  </div>
+  <p class="section-desc">${sec.desc}</p>`;
+
+            sec.items.forEach((item, i) => {
+                const selected = ans[i];
+                html += `<div class="question-card">
+      <div class="question-num">Pregunta ${i + 1} de ${sec.items.length}</div>
+      <div class="question-text">${item.q}</div>
+      <div class="options-row">`;
+                sec.scale.forEach(opt => {
+                    const isSel = selected === opt.v;
+                    html += `<button class="opt-btn ${isSel ? 'selected' : ''}" onclick="answer('${sec.id}',${i},${opt.v})">
+        <span class="opt-dot"></span>${opt.l}
+      </button>`;
+                });
+                html += `</div></div>`;
+            });
+
+            const allDone = sec.items.every((_, i) => ans[i] !== undefined);
+            html += `<div class="nav-btns">
+    ${state.section > 1 ? '<button class="btn-secondary" onclick="prevSection()">Atrás</button>' : ''}
+    <button class="btn-primary" onclick="nextSection()" ${!allDone ? 'disabled' : ''}>
+      ${state.section === SECTIONS.length - 2 ? 'Ver resultados' : 'Siguiente instrumento'}
+    </button>
+  </div>`;
+            return html;
+        }
+
+        function renderResults() {
+            const pq = scoreProQOL(), mbi = scoreMBI(), dass = scoreDASS(), risk = hasRisk();
+            let html = `<div class="results-wrap">
+    <p class="results-title">Tus resultados</p>
+    <p class="results-intro">A continuación encontrarás un resumen de tus puntajes. Recuerda que esto es orientativo, no un diagnóstico clínico.</p>
+
+    <div class="result-card">
+      <div class="result-card-title">ProQOL — Calidad de vida profesional</div>
+      <div class="result-sub">Fatiga y satisfacción por compasión</div>
+      <div class="score-row">
+        <span class="score-label">Satisfacción (CS)</span>
+        <div class="score-bar-wrap"><div class="score-bar bar-green" style="width:${pq.cs}%"></div></div>
+        <span class="score-val" style="color:#3a7a3a">${pq.cs}%</span>
+      </div>
+      <div class="score-row">
+        <span class="score-label">Burnout</span>
+        <div class="score-bar-wrap"><div class="score-bar ${pq.bo > 60 ? 'bar-red' : pq.bo > 35 ? 'bar-amber' : 'bar-green'}" style="width:${pq.bo}%"></div></div>
+        <span class="score-val">${pq.bo}%</span>
+      </div>
+      <div class="score-row">
+        <span class="score-label">Estrés traumático (STS)</span>
+        <div class="score-bar-wrap"><div class="score-bar ${pq.sts > 60 ? 'bar-red' : pq.sts > 35 ? 'bar-amber' : 'bar-green'}" style="width:${pq.sts}%"></div></div>
+        <span class="score-val">${pq.sts}%</span>
+      </div>
+    </div>
+
+    <div class="result-card">
+      <div class="result-card-title">MBI — Inventario de Burnout de Maslach</div>
+      <div class="result-sub">Tres dimensiones del desgaste laboral</div>
+      <div class="score-row">
+        <span class="score-label">Agot. emocional ${riskBadge(mbi.aeRisk)}</span>
+        <div class="score-bar-wrap"><div class="score-bar ${riskColor(mbi.aeRisk)}" style="width:${mbi.ae}%"></div></div>
+        <span class="score-val">${mbi.aeRaw}/6</span>
+      </div>
+      <div class="score-row">
+        <span class="score-label">Despersonalización ${riskBadge(mbi.dpRisk)}</span>
+        <div class="score-bar-wrap"><div class="score-bar ${riskColor(mbi.dpRisk)}" style="width:${mbi.dp}%"></div></div>
+        <span class="score-val">${mbi.dpRaw}/6</span>
+      </div>
+      <div class="score-row">
+        <span class="score-label">Baja realización ${riskBadge(mbi.rpRisk)}</span>
+        <div class="score-bar-wrap"><div class="score-bar ${riskColor(mbi.rpRisk)}" style="width:${mbi.rp}%"></div></div>
+        <span class="score-val">${mbi.rpRaw}/6</span>
+      </div>
+    </div>
+
+    <div class="result-card">
+      <div class="result-card-title">DASS-21 — Bienestar emocional</div>
+      <div class="result-sub">Depresión, ansiedad y estrés</div>
+      <div class="score-row">
+        <span class="score-label">Depresión ${riskBadge(dass.dRisk)}</span>
+        <div class="score-bar-wrap"><div class="score-bar ${riskColor(dass.dRisk)}" style="width:${dass.d}%"></div></div>
+        <span class="score-val">${dass.dRaw}</span>
+      </div>
+      <div class="score-row">
+        <span class="score-label">Ansiedad ${riskBadge(dass.anRisk)}</span>
+        <div class="score-bar-wrap"><div class="score-bar ${riskColor(dass.anRisk)}" style="width:${dass.an}%"></div></div>
+        <span class="score-val">${dass.anRaw}</span>
+      </div>
+      <div class="score-row">
+        <span class="score-label">Estrés ${riskBadge(dass.sRisk)}</span>
+        <div class="score-bar-wrap"><div class="score-bar ${riskColor(dass.sRisk)}" style="width:${dass.s}%"></div></div>
+        <span class="score-val">${dass.sRaw}</span>
+      </div>
+    </div>`;
+
+            if (risk) {
+                html += `<div class="alert-card">
+      <div class="alert-title">Algunos indicadores merecen atención</div>
+      <p class="alert-text">Tus puntajes sugieren que podrías estar experimentando un nivel de desgaste que puede interferir en tu bienestar o en tu capacidad de cuidar. Una asesoría psicológica breve puede ayudarte a evaluar si necesitas apoyo especializado.</p>
+      <a class="btn-encuadrado" href="https://encuadrado.com/p/rodrigo-figueroa/s/asesoria-psicologica-o-primeros-auxilios-psicologicos-para-tutores-y-voluntarios-fundacion-bunny-lovers" target="_blank" rel="noopener">Agendar asesoría gratuita con Rodrigo →</a>
+    </div>`;
+            } else {
+                html += `<div class="ok-card">
+      <div class="ok-title">Tus puntajes están dentro del rango esperado</div>
+      <p class="ok-text">No se detectan indicadores de riesgo elevado por el momento. Recuerda que el autocuidado es preventivo: mantener hábitos de bienestar te ayudará a sostener tu compromiso con Bunny Lovers. Si en algún momento sientes que algo cambia, puedes volver a completar este tamizaje o consultar directamente.</p>
+    </div>`;
+            }
+
+            html += `<div class="disclaimer">Este tamizaje no reemplaza una evaluación clínica profesional. Los resultados son orientativos. Si tienes dudas sobre tu bienestar emocional, consulta con un profesional de salud mental.</div>
+    <button class="btn-restart" onclick="restartApp()">Volver a comenzar</button>
+  </div>`;
+            return html;
+        }
+
+        function render() {
+            const sec = SECTIONS[state.section];
+            const prog = getProgress();
+            let html = '';
+
+            if (sec.type === 'intro') {
+                html = renderIntro();
+            } else if (sec.type === 'instrument') {
+                html = `<div class="progress-bar-wrap">
+      <div class="progress-label"><span>Progreso</span><span>${prog}%</span></div>
+      <div class="progress-track"><div class="progress-fill" style="width:${prog}%"></div></div>
+    </div>` + renderInstrument(sec);
+            } else {
+                html = `<div class="progress-bar-wrap">
+      <div class="progress-label"><span>Completado</span><span>100%</span></div>
+      <div class="progress-track"><div class="progress-fill" style="width:100%"></div></div>
+    </div>` + renderResults();
+            }
+
+            document.getElementById('main-content').innerHTML = html;
+            window.scrollTo(0, 0);
+        }
+
+        function answer(sec, idx, val) { state.answers[sec][idx] = val; render(); }
+        function nextSection() { if (state.section < SECTIONS.length - 1) { state.section++; render(); } }
+        function prevSection() { if (state.section > 0) { state.section--; render(); } }
+        function restartApp() { state = { section: 0, answers: { proqol: {}, mbi: {}, dass: {} } }; render(); }
+
+        render();
+    </script>
+</body>
+
+</html>
