@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tamizaje de Salud Mental — Bunny Lovers</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Lato:wght@300;400;700&display=swap');
 
@@ -63,7 +64,6 @@
             font-size: 22px;
             font-weight: 500;
             color: var(--terracota);
-            letter-spacing: 0.01em;
         }
 
         .header p {
@@ -400,24 +400,6 @@
             font-size: 13px;
             color: #6a3c30;
             line-height: 1.6;
-            margin-bottom: 14px;
-        }
-
-        .btn-encuadrado {
-            display: inline-block;
-            padding: 12px 24px;
-            background: var(--terracota);
-            color: white;
-            border-radius: 30px;
-            font-size: 14px;
-            font-weight: 700;
-            text-decoration: none;
-            font-family: 'Lato', sans-serif;
-            transition: background 0.15s;
-        }
-
-        .btn-encuadrado:hover {
-            background: #8c4a3d;
         }
 
         .ok-card {
@@ -439,6 +421,57 @@
             font-size: 13px;
             color: #3a5a3a;
             line-height: 1.6;
+        }
+
+        .action-btns {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 16px 0;
+        }
+
+        .btn-pdf {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 13px 24px;
+            background: white;
+            border: 1.5px solid var(--terracota);
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--terracota);
+            cursor: pointer;
+            font-family: 'Lato', sans-serif;
+            transition: all 0.15s;
+            text-decoration: none;
+        }
+
+        .btn-pdf:hover {
+            background: var(--terracota-pale);
+        }
+
+        .btn-encuadrado {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 13px 24px;
+            background: var(--terracota);
+            color: white;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            font-family: 'Lato', sans-serif;
+            border: none;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .btn-encuadrado:hover {
+            background: #8c4a3d;
         }
 
         .disclaimer {
@@ -468,13 +501,6 @@
         .btn-restart:hover {
             border-color: var(--terracota);
             color: var(--terracota);
-        }
-
-        .scale-hint {
-            font-size: 11px;
-            color: var(--warm-gray);
-            margin-bottom: 10px;
-            font-style: italic;
         }
 
         .intro-card {
@@ -528,6 +554,46 @@
             margin: 0 auto 16px;
             display: block;
         }
+
+        .user-fields {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 16px 0 20px;
+            text-align: left;
+        }
+
+        .field-label {
+            font-size: 12px;
+            color: var(--warm-gray);
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .field-input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid var(--sage-light);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-family: 'Lato', sans-serif;
+            color: var(--dark);
+            background: var(--sage-bg);
+            outline: none;
+            transition: border-color 0.15s;
+        }
+
+        .field-input:focus {
+            border-color: var(--sage);
+            background: white;
+        }
+
+        .field-note {
+            font-size: 11px;
+            color: var(--warm-gray);
+            margin-top: 2px;
+            font-style: italic;
+        }
     </style>
 </head>
 
@@ -535,7 +601,7 @@
     <div id="app">
         <div class="header">
             <div class="header-logo">
-                <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
                     <ellipse cx="18" cy="22" rx="10" ry="8" fill="#c8dcc8" />
                     <ellipse cx="13" cy="11" rx="3" ry="7" fill="#c8dcc8" />
                     <ellipse cx="23" cy="11" rx="3" ry="7" fill="#c8dcc8" />
@@ -556,9 +622,10 @@
     </div>
 
     <script>
+        const ENCUADRADO_URL = 'https://encuadrado.com/p/rodrigo-figueroa/s/asesoria-psicologica-o-primeros-auxilios-psicologicos-para-tutores-y-voluntarios-fundacion-bunny-lovers';
+
         const PROQOL_ITEMS = [
-            { q: "Soy feliz." },
-            { q: "Me preocupo por las personas que atiendo." },
+            { q: "Soy feliz." }, { q: "Me preocupo por las personas que atiendo." },
             { q: "Me siento satisfecho/a por poder ayudar a los animales y personas de la fundación." },
             { q: "Me siento conectado/a con los demás." },
             { q: "Saltos o flashbacks de situaciones perturbadoras que he presenciado (p. ej., animales abandonados, sufrimiento)." },
@@ -568,14 +635,7 @@
             { q: "Me siento 'atrapado/a' por mi trabajo en la fundación." },
             { q: "Creo que he sido 'contaminado/a' por el estrés traumático de quienes ayudo." },
         ];
-
-        const PROQOL_SCALE = [
-            { v: 1, l: "Nunca" },
-            { v: 2, l: "Raramente" },
-            { v: 3, l: "A veces" },
-            { v: 4, l: "A menudo" },
-            { v: 5, l: "Muy frecuente" },
-        ];
+        const PROQOL_SCALE = [{ v: 1, l: "Nunca" }, { v: 2, l: "Raramente" }, { v: 3, l: "A veces" }, { v: 4, l: "A menudo" }, { v: 5, l: "Muy frecuente" }];
 
         const MBI_ITEMS = [
             { q: "Me siento emocionalmente agotado/a por mi trabajo en la fundación.", sub: "AE" },
@@ -601,47 +661,38 @@
             { q: "He conseguido muchas cosas valiosas en este trabajo.", sub: "RP", inv: true },
             { q: "Siento que en mi trabajo trato los problemas emocionales con mucha calma.", sub: "RP", inv: true },
         ];
-
-        const MBI_SCALE = [
-            { v: 0, l: "Nunca" },
-            { v: 1, l: "Pocas veces al año" },
-            { v: 2, l: "Una vez al mes" },
-            { v: 3, l: "Pocas veces al mes" },
-            { v: 4, l: "Una vez a la semana" },
-            { v: 5, l: "Pocas veces a la semana" },
-            { v: 6, l: "Todos los días" },
-        ];
+        const MBI_SCALE = [{ v: 0, l: "Nunca" }, { v: 1, l: "Pocas veces al año" }, { v: 2, l: "Una vez al mes" }, { v: 3, l: "Pocas veces al mes" }, { v: 4, l: "Una vez a la semana" }, { v: 5, l: "Pocas veces a la semana" }, { v: 6, l: "Todos los días" }];
 
         const DASS_ITEMS = [
-            { q: "Me costó mucho relajarme.", sub: "S" },
-            { q: "Me di cuenta que tenía la boca seca.", sub: "A" },
+            { q: "Me costó mucho relajarme.", sub: "S" }, { q: "Me di cuenta que tenía la boca seca.", sub: "A" },
             { q: "No podía sentir ningún sentimiento positivo.", sub: "D" },
             { q: "Tuve dificultad en respirar (p.ej. respiración excesivamente rápida, falta de aire sin haber hecho esfuerzo físico).", sub: "A" },
             { q: "Me resultó difícil tener iniciativa para hacer cosas.", sub: "D" },
             { q: "Reaccioné de manera exagerada a ciertas situaciones.", sub: "S" },
-            { q: "Noté temblores (p.ej. en las manos).", sub: "A" },
-            { q: "Sentí que estaba muy nervioso/a.", sub: "S" },
+            { q: "Noté temblores (p.ej. en las manos).", sub: "A" }, { q: "Sentí que estaba muy nervioso/a.", sub: "S" },
             { q: "Me preocupé por situaciones en las que podía entrar en pánico y hacer el ridículo.", sub: "A" },
-            { q: "Sentí que no había nada que me ilusionara.", sub: "D" },
-            { q: "Me sentí agitado/a.", sub: "S" },
-            { q: "Me resultó difícil relajarme.", sub: "S" },
-            { q: "Me sentí desanimado/a y triste.", sub: "D" },
+            { q: "Sentí que no había nada que me ilusionara.", sub: "D" }, { q: "Me sentí agitado/a.", sub: "S" },
+            { q: "Me resultó difícil relajarme.", sub: "S" }, { q: "Me sentí desanimado/a y triste.", sub: "D" },
             { q: "No toleré nada que me impidiera continuar con lo que estaba haciendo.", sub: "S" },
             { q: "Sentí que estaba a punto de entrar en pánico.", sub: "A" },
             { q: "Fui incapaz de sentir entusiasmo por las cosas.", sub: "D" },
-            { q: "Sentí que valía poco como persona.", sub: "D" },
-            { q: "Sentí que estaba bastante irritable.", sub: "S" },
+            { q: "Sentí que valía poco como persona.", sub: "D" }, { q: "Sentí que estaba bastante irritable.", sub: "S" },
             { q: "Sentí los latidos de mi corazón a pesar de no haber hecho ningún esfuerzo físico.", sub: "A" },
-            { q: "Tuve miedo sin razón aparente.", sub: "A" },
-            { q: "Sentí que la vida no tenía ningún sentido.", sub: "D" },
+            { q: "Tuve miedo sin razón aparente.", sub: "A" }, { q: "Sentí que la vida no tenía ningún sentido.", sub: "D" },
         ];
+        const DASS_SCALE = [{ v: 0, l: "No me ocurrió" }, { v: 1, l: "Me ocurrió un poco" }, { v: 2, l: "Me ocurrió bastante" }, { v: 3, l: "Me ocurrió mucho" }];
 
-        const DASS_SCALE = [
-            { v: 0, l: "No me ocurrió" },
-            { v: 1, l: "Me ocurrió un poco" },
-            { v: 2, l: "Me ocurrió bastante" },
-            { v: 3, l: "Me ocurrió mucho" },
-        ];
+        const RECOMENDACIONES = {
+            proqol_cs_bajo: "Tu nivel de satisfacción por compasión es bajo. Intenta reconectar con el sentido de tu labor: recuerda casos en que tu apoyo hizo una diferencia real. Buscar pequeños momentos de celebración colectiva dentro del equipo puede ayudar.",
+            proqol_bo_alto: "Se detecta un nivel elevado de burnout en la escala ProQOL. Es importante revisar la carga de trabajo, establecer límites más claros y permitirte descansos reales, sin culpa.",
+            proqol_sts_alto: "Hay indicadores de estrés traumático secundario. Considera espacios de descarga emocional, supervisión o apoyo psicológico. Limitar la exposición a contenido perturbador fuera del horario de voluntariado puede ayudar.",
+            mbi_ae_alto: "Tu nivel de agotamiento emocional es elevado. Prioriza el descanso activo, establece horarios sin disponibilidad para la fundación y busca apoyo en tu red personal.",
+            mbi_dp_alto: "Se observa un nivel alto de despersonalización. Esto puede ser una señal de que el trabajo emocional está sobrepasando tus recursos actuales. Hablar con alguien de confianza o un profesional puede ayudarte a recuperar la conexión.",
+            mbi_rp_alto: "Tu sentido de realización personal en el trabajo está disminuido. Establecer metas pequeñas y alcanzables, y reconocer logros concretos, puede ayudar a recuperar la motivación.",
+            dass_d_mod: "Se detectan indicadores de estado de ánimo bajo. Mantener rutinas, actividad física y conexión social son factores protectores importantes en este momento.",
+            dass_an_mod: "Hay indicadores de ansiedad que merecen atención. Técnicas de respiración, mindfulness y reducir la exposición a situaciones desbordantes pueden ser de ayuda.",
+            dass_s_mod: "Tu nivel de estrés es elevado. Revisar la distribución de tareas, establecer pausas activas durante el día y practicar actividades de descanso puede marcar una diferencia importante.",
+        };
 
         const SECTIONS = [
             { id: 'intro', type: 'intro' },
@@ -651,16 +702,14 @@
             { id: 'results', type: 'results' },
         ];
 
-        let state = { section: 0, answers: { proqol: {}, mbi: {}, dass: {} } };
+        let state = { section: 0, answers: { proqol: {}, mbi: {}, dass: {} }, userName: '', userRole: '' };
 
         function totalQuestions() { return PROQOL_ITEMS.length + MBI_ITEMS.length + DASS_ITEMS.length; }
-
         function answeredCount() {
             let c = 0;
             ['proqol', 'mbi', 'dass'].forEach(k => Object.values(state.answers[k]).forEach(v => { if (v !== undefined) c++; }));
             return c;
         }
-
         function getProgress() {
             if (state.section === 0) return 0;
             if (state.section === SECTIONS.length - 1) return 100;
@@ -672,76 +721,146 @@
             const cs = [0, 1, 2, 3, 5, 7].reduce((s, i) => s + (a[i] || 0), 0);
             const bo = [8, 9].reduce((s, i) => s + (a[i] || 0), 0);
             const sts = [4, 6].reduce((s, i) => s + (a[i] || 0), 0);
-            return {
-                cs: Math.round(cs / 30 * 100),
-                bo: Math.round(bo / 10 * 100),
-                sts: Math.round(sts / 10 * 100),
-                csRaw: cs, boRaw: bo, stsRaw: sts
-            };
+            return { cs: Math.round(cs / 30 * 100), bo: Math.round(bo / 10 * 100), sts: Math.round(sts / 10 * 100), csRaw: cs, boRaw: bo, stsRaw: sts };
         }
 
         function scoreMBI() {
             const a = state.answers.mbi;
             let ae = 0, dp = 0, rp = 0, aeN = 0, dpN = 0, rpN = 0;
-            MBI_ITEMS.forEach((item, i) => {
-                const v = a[i] || 0;
-                if (item.sub === 'AE') { ae += v; aeN++; }
-                else if (item.sub === 'DP') { dp += v; dpN++; }
-                else { rp += v; rpN++; }
-            });
-            const aeAvg = aeN ? ae / aeN : 0, dpAvg = dpN ? dp / dpN : 0, rpAvg = rpN ? rp / rpN : 0;
-            return {
-                ae: Math.round(aeAvg * 100 / 6),
-                dp: Math.round(dpAvg * 100 / 6),
-                rp: Math.round((1 - rpAvg / 6) * 100),
-                aeRisk: aeAvg > 3.2 ? 'alto' : aeAvg > 1.5 ? 'moderado' : 'bajo',
-                dpRisk: dpAvg > 1.5 ? 'alto' : dpAvg > 0.6 ? 'moderado' : 'bajo',
-                rpRisk: rpAvg < 3.7 ? 'alto' : rpAvg < 4.5 ? 'moderado' : 'bajo',
-                aeRaw: Math.round(aeAvg * 10) / 10,
-                dpRaw: Math.round(dpAvg * 10) / 10,
-                rpRaw: Math.round(rpAvg * 10) / 10,
-            };
+            MBI_ITEMS.forEach((item, i) => { const v = a[i] || 0; if (item.sub === 'AE') { ae += v; aeN++; } else if (item.sub === 'DP') { dp += v; dpN++; } else { rp += v; rpN++; } });
+            const aeA = aeN ? ae / aeN : 0, dpA = dpN ? dp / dpN : 0, rpA = rpN ? rp / rpN : 0;
+            return { ae: Math.round(aeA * 100 / 6), dp: Math.round(dpA * 100 / 6), rp: Math.round((1 - rpA / 6) * 100), aeRisk: aeA > 3.2 ? 'alto' : aeA > 1.5 ? 'moderado' : 'bajo', dpRisk: dpA > 1.5 ? 'alto' : dpA > 0.6 ? 'moderado' : 'bajo', rpRisk: rpA < 3.7 ? 'alto' : rpA < 4.5 ? 'moderado' : 'bajo', aeRaw: Math.round(aeA * 10) / 10, dpRaw: Math.round(dpA * 10) / 10, rpRaw: Math.round(rpA * 10) / 10 };
         }
 
         function scoreDASS() {
             const a = state.answers.dass;
             let d = 0, an = 0, s = 0;
-            DASS_ITEMS.forEach((item, i) => {
-                const v = (a[i] || 0) * 2;
-                if (item.sub === 'D') d += v;
-                else if (item.sub === 'A') an += v;
-                else s += v;
-            });
-            const lvl = (v, cuts) => v >= cuts[3] ? 'severo' : v >= cuts[2] ? 'moderado-severo' : v >= cuts[1] ? 'moderado' : v >= cuts[0] ? 'leve' : 'normal';
-            return {
-                d: Math.round(d / 42 * 100),
-                an: Math.round(an / 42 * 100),
-                s: Math.round(s / 42 * 100),
-                dRisk: lvl(d, [10, 14, 21, 28]),
-                anRisk: lvl(an, [8, 10, 15, 20]),
-                sRisk: lvl(s, [15, 19, 26, 34]),
-                dRaw: d, anRaw: an, sRaw: s,
-            };
+            DASS_ITEMS.forEach((item, i) => { const v = (a[i] || 0) * 2; if (item.sub === 'D') d += v; else if (item.sub === 'A') an += v; else s += v; });
+            const lvl = (v, c) => v >= c[3] ? 'severo' : v >= c[2] ? 'moderado-severo' : v >= c[1] ? 'moderado' : v >= c[0] ? 'leve' : 'normal';
+            return { d: Math.round(d / 42 * 100), an: Math.round(an / 42 * 100), s: Math.round(s / 42 * 100), dRisk: lvl(d, [10, 14, 21, 28]), anRisk: lvl(an, [8, 10, 15, 20]), sRisk: lvl(s, [15, 19, 26, 34]), dRaw: d, anRaw: an, sRaw: s };
         }
 
         function hasRisk() {
             const mbi = scoreMBI(), dass = scoreDASS(), pq = scoreProQOL();
-            const riskLevels = ['moderado', 'moderado-severo', 'severo'];
-            return mbi.aeRisk === 'alto' || mbi.dpRisk === 'alto' || mbi.rpRisk === 'alto' ||
-                riskLevels.includes(dass.dRisk) || riskLevels.includes(dass.anRisk) || riskLevels.includes(dass.sRisk) ||
-                pq.bo > 60 || pq.sts > 60;
+            const rl = ['moderado', 'moderado-severo', 'severo'];
+            return mbi.aeRisk === 'alto' || mbi.dpRisk === 'alto' || mbi.rpRisk === 'alto' || rl.includes(dass.dRisk) || rl.includes(dass.anRisk) || rl.includes(dass.sRisk) || pq.bo > 60 || pq.sts > 60;
         }
 
-        function riskColor(l) {
-            if (['bajo', 'normal'].includes(l)) return 'bar-green';
-            if (l === 'leve' || l === 'moderado') return 'bar-amber';
-            return 'bar-red';
+        function riskColor(l) { if (['bajo', 'normal'].includes(l)) return 'bar-green'; if (l === 'leve' || l === 'moderado') return 'bar-amber'; return 'bar-red'; }
+        function riskBadge(l) { if (['bajo', 'normal'].includes(l)) return '<span class="risk-badge badge-ok">Normal</span>'; if (l === 'leve' || l === 'moderado') return '<span class="risk-badge badge-mod">Atención</span>'; return '<span class="risk-badge badge-high">Elevado</span>'; }
+        function levelLabel(l) { const m = { normal: 'Normal', leve: 'Leve', moderado: 'Moderado', 'moderado-severo': 'Mod-severo', severo: 'Severo', bajo: 'Bajo', alto: 'Alto' }; return m[l] || l; }
+
+        function getRecs() {
+            const pq = scoreProQOL(), mbi = scoreMBI(), dass = scoreDASS();
+            const rl = ['moderado', 'moderado-severo', 'severo'], recs = [];
+            if (pq.cs < 40) recs.push(RECOMENDACIONES.proqol_cs_bajo);
+            if (pq.bo > 60) recs.push(RECOMENDACIONES.proqol_bo_alto);
+            if (pq.sts > 60) recs.push(RECOMENDACIONES.proqol_sts_alto);
+            if (mbi.aeRisk === 'alto') recs.push(RECOMENDACIONES.mbi_ae_alto);
+            if (mbi.dpRisk === 'alto') recs.push(RECOMENDACIONES.mbi_dp_alto);
+            if (mbi.rpRisk === 'alto') recs.push(RECOMENDACIONES.mbi_rp_alto);
+            if (rl.includes(dass.dRisk)) recs.push(RECOMENDACIONES.dass_d_mod);
+            if (rl.includes(dass.anRisk)) recs.push(RECOMENDACIONES.dass_an_mod);
+            if (rl.includes(dass.sRisk)) recs.push(RECOMENDACIONES.dass_s_mod);
+            return recs;
         }
 
-        function riskBadge(l) {
-            if (['bajo', 'normal'].includes(l)) return '<span class="risk-badge badge-ok">Normal</span>';
-            if (l === 'leve' || l === 'moderado') return '<span class="risk-badge badge-mod">Atención</span>';
-            return '<span class="risk-badge badge-high">Elevado</span>';
+        function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+            const pq = scoreProQOL(), mbi = scoreMBI(), dass = scoreDASS(), recs = getRecs(), risk = hasRisk();
+            const today = new Date().toLocaleDateString('es-CL', { day: '2-digit', month: 'long', year: 'numeric' });
+            const margin = 20, col = 170, lineH = 7;
+            let y = 20;
+
+            const chk = (n = 10) => { if (y + n > 275) { doc.addPage(); y = 20; } };
+
+            doc.setFillColor(238, 244, 238);
+            doc.rect(0, 0, 210, 38, 'F');
+            doc.setFont('helvetica', 'bold'); doc.setFontSize(15); doc.setTextColor(160, 88, 74);
+            doc.text('Bunny Lovers — Reporte de Tamizaje de Salud Mental', margin, 15);
+            doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(122, 117, 112);
+            doc.text('Material confidencial y orientativo. No reemplaza una evaluación clínica profesional.', margin, 23);
+            doc.text('Fecha: ' + today, margin, 30);
+            y = 46;
+
+            doc.setFillColor(255, 255, 255); doc.setDrawColor(200, 220, 200);
+            doc.roundedRect(margin, y, col, 22, 3, 3, 'FD');
+            doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(46, 42, 38);
+            doc.text('Datos del evaluado/a', margin + 6, y + 8);
+            doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
+            doc.text('Nombre: ' + (state.userName || 'No especificado'), margin + 6, y + 16);
+            doc.text('Rol: ' + (state.userRole || 'No especificado'), margin + 90, y + 16);
+            y += 30;
+
+            const sec = (title, r, g, b) => { chk(14); doc.setFillColor(r, g, b); doc.rect(margin, y, col, 9, 'F'); doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.setTextColor(255, 255, 255); doc.text(title, margin + 4, y + 6.5); y += 13; doc.setTextColor(46, 42, 38); };
+
+            const row = (label, pct, raw, lvl) => {
+                chk(10);
+                doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(100, 96, 92);
+                doc.text(label, margin + 2, y + 4);
+                doc.setFillColor(220, 235, 220); doc.roundedRect(margin + 68, y, 70, 5, 1, 1, 'F');
+                const bw = Math.max(1, Math.round(pct * 70 / 100));
+                const bc = pct > 65 ? [192, 80, 64] : pct > 40 ? [212, 160, 85] : [106, 171, 106];
+                doc.setFillColor(...bc); doc.roundedRect(margin + 68, y, bw, 5, 1, 1, 'F');
+                doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(46, 42, 38);
+                doc.text(pct + '%  ' + raw + '  [' + lvl + ']', margin + 142, y + 4);
+                y += lineH;
+            };
+
+            sec('ProQOL — Calidad de Vida Profesional', 160, 88, 74);
+            row('Satisfaccion por compasion (CS)', pq.cs, pq.csRaw + '/30', pq.cs >= 60 ? 'Bueno' : pq.cs >= 40 ? 'Moderado' : 'Bajo');
+            row('Burnout', pq.bo, pq.boRaw + '/10', pq.bo > 60 ? 'Elevado' : pq.bo > 35 ? 'Moderado' : 'Bajo');
+            row('Estres traumatico secundario (STS)', pq.sts, pq.stsRaw + '/10', pq.sts > 60 ? 'Elevado' : pq.sts > 35 ? 'Moderado' : 'Bajo');
+            y += 4;
+
+            sec('MBI — Inventario de Burnout de Maslach', 138, 170, 138);
+            row('Agotamiento emocional', mbi.ae, mbi.aeRaw + '/6', levelLabel(mbi.aeRisk));
+            row('Despersonalizacion', mbi.dp, mbi.dpRaw + '/6', levelLabel(mbi.dpRisk));
+            row('Baja realizacion personal', mbi.rp, mbi.rpRaw + '/6', levelLabel(mbi.rpRisk));
+            y += 4;
+
+            sec('DASS-21 — Depresion, Ansiedad y Estres', 160, 88, 74);
+            row('Depresion', dass.d, dass.dRaw + '/42', levelLabel(dass.dRisk));
+            row('Ansiedad', dass.an, dass.anRaw + '/42', levelLabel(dass.anRisk));
+            row('Estres', dass.s, dass.sRaw + '/42', levelLabel(dass.sRisk));
+            y += 6;
+
+            if (recs.length > 0) {
+                chk(16);
+                doc.setFillColor(245, 237, 232); doc.setDrawColor(212, 144, 127);
+                doc.roundedRect(margin, y, col, 9, 3, 3, 'FD');
+                doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.setTextColor(160, 88, 74);
+                doc.text('Recomendaciones personalizadas', margin + 4, y + 6.5);
+                y += 13;
+                recs.forEach((rec, i) => {
+                    chk(24);
+                    doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(160, 88, 74);
+                    doc.text((i + 1) + '.', margin + 2, y + 4);
+                    doc.setFont('helvetica', 'normal'); doc.setTextColor(46, 42, 38);
+                    const lines = doc.splitTextToSize(rec, col - 12);
+                    doc.text(lines, margin + 8, y + 4);
+                    y += lines.length * 5 + 5;
+                });
+                y += 4;
+            }
+
+            chk(24);
+            const bc = risk ? [251, 232, 232] : [240, 248, 240], bdr = risk ? [192, 80, 64] : [168, 212, 168], tc = risk ? [154, 48, 48] : [58, 106, 58];
+            doc.setFillColor(...bc); doc.setDrawColor(...bdr);
+            doc.roundedRect(margin, y, col, 26, 3, 3, 'FD');
+            doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(...tc);
+            doc.text(risk ? 'Algunos indicadores merecen atencion profesional' : 'Resultados dentro del rango esperado', margin + 6, y + 8);
+            doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
+            const ct = risk ? 'Se sugiere agendar una asesoria psicologica. encuadrado.com/p/rodrigo-figueroa' : 'No se detectan indicadores de riesgo elevado. Mantente atento/a a tu bienestar.';
+            doc.text(doc.splitTextToSize(ct, col - 12), margin + 6, y + 16);
+            y += 32;
+
+            chk(10);
+            doc.setFont('helvetica', 'italic'); doc.setFontSize(8); doc.setTextColor(160, 155, 150);
+            doc.text('Rodrigo Figueroa — Psicologo Clinico — rfigueroas.ps@gmail.com — Bunny Lovers', margin, y);
+
+            doc.save('tamizaje-bl-' + (state.userName || 'evaluado').replace(/\s+/g, '-').toLowerCase() + '-' + new Date().toISOString().slice(0, 10) + '.pdf');
         }
 
         function renderIntro() {
@@ -767,6 +886,17 @@
       <span class="instr-pill">DASS-21</span>
     </div>
     <p class="time-note">Tiempo estimado: 10–15 minutos &bull; 53 preguntas en total</p>
+    <div class="user-fields">
+      <div>
+        <label class="field-label">Tu nombre (opcional)</label>
+        <input class="field-input" type="text" placeholder="Ej: María González" value="${state.userName}" oninput="state.userName=this.value"/>
+        <p class="field-note">Solo aparecerá en el reporte PDF si decides descargarlo.</p>
+      </div>
+      <div>
+        <label class="field-label">Tu rol en Bunny Lovers (opcional)</label>
+        <input class="field-input" type="text" placeholder="Ej: Hogar temporal, División C.A.R.E., Comunicaciones..." value="${state.userRole}" oninput="state.userRole=this.value"/>
+      </div>
+    </div>
     <button class="btn-primary" onclick="nextSection()">Comenzar tamizaje</button>
   </div>
   <div class="warning-box">
@@ -776,155 +906,86 @@
 
         function renderInstrument(sec) {
             const ans = state.answers[sec.id];
-            let html = `
-  <div class="section-header">
-    <div class="section-label">${sec.label}</div>
-    <div class="section-title">${sec.title}</div>
-  </div>
-  <p class="section-desc">${sec.desc}</p>`;
-
+            let html = `<div class="section-header"><div class="section-label">${sec.label}</div><div class="section-title">${sec.title}</div></div><p class="section-desc">${sec.desc}</p>`;
             sec.items.forEach((item, i) => {
-                const selected = ans[i];
-                html += `<div class="question-card">
-      <div class="question-num">Pregunta ${i + 1} de ${sec.items.length}</div>
-      <div class="question-text">${item.q}</div>
-      <div class="options-row">`;
+                const sel = ans[i];
+                html += `<div class="question-card"><div class="question-num">Pregunta ${i + 1} de ${sec.items.length}</div><div class="question-text">${item.q}</div><div class="options-row">`;
                 sec.scale.forEach(opt => {
-                    const isSel = selected === opt.v;
-                    html += `<button class="opt-btn ${isSel ? 'selected' : ''}" onclick="answer('${sec.id}',${i},${opt.v})">
-        <span class="opt-dot"></span>${opt.l}
-      </button>`;
+                    html += `<button class="opt-btn ${sel === opt.v ? 'selected' : ''}" onclick="answer('${sec.id}',${i},${opt.v})"><span class="opt-dot"></span>${opt.l}</button>`;
                 });
                 html += `</div></div>`;
             });
-
             const allDone = sec.items.every((_, i) => ans[i] !== undefined);
-            html += `<div class="nav-btns">
-    ${state.section > 1 ? '<button class="btn-secondary" onclick="prevSection()">Atrás</button>' : ''}
-    <button class="btn-primary" onclick="nextSection()" ${!allDone ? 'disabled' : ''}>
-      ${state.section === SECTIONS.length - 2 ? 'Ver resultados' : 'Siguiente instrumento'}
-    </button>
-  </div>`;
+            html += `<div class="nav-btns">${state.section > 1 ? '<button class="btn-secondary" onclick="prevSection()">Atrás</button>' : ''}<button class="btn-primary" onclick="nextSection()" ${!allDone ? 'disabled' : ''}>${state.section === SECTIONS.length - 2 ? 'Ver resultados' : 'Siguiente instrumento'}</button></div>`;
             return html;
         }
 
         function renderResults() {
-            const pq = scoreProQOL(), mbi = scoreMBI(), dass = scoreDASS(), risk = hasRisk();
+            const pq = scoreProQOL(), mbi = scoreMBI(), dass = scoreDASS(), risk = hasRisk(), recs = getRecs();
             let html = `<div class="results-wrap">
     <p class="results-title">Tus resultados</p>
     <p class="results-intro">A continuación encontrarás un resumen de tus puntajes. Recuerda que esto es orientativo, no un diagnóstico clínico.</p>
-
     <div class="result-card">
-      <div class="result-card-title">ProQOL — Calidad de vida profesional</div>
-      <div class="result-sub">Fatiga y satisfacción por compasión</div>
-      <div class="score-row">
-        <span class="score-label">Satisfacción (CS)</span>
-        <div class="score-bar-wrap"><div class="score-bar bar-green" style="width:${pq.cs}%"></div></div>
-        <span class="score-val" style="color:#3a7a3a">${pq.cs}%</span>
-      </div>
-      <div class="score-row">
-        <span class="score-label">Burnout</span>
-        <div class="score-bar-wrap"><div class="score-bar ${pq.bo > 60 ? 'bar-red' : pq.bo > 35 ? 'bar-amber' : 'bar-green'}" style="width:${pq.bo}%"></div></div>
-        <span class="score-val">${pq.bo}%</span>
-      </div>
-      <div class="score-row">
-        <span class="score-label">Estrés traumático (STS)</span>
-        <div class="score-bar-wrap"><div class="score-bar ${pq.sts > 60 ? 'bar-red' : pq.sts > 35 ? 'bar-amber' : 'bar-green'}" style="width:${pq.sts}%"></div></div>
-        <span class="score-val">${pq.sts}%</span>
-      </div>
+      <div class="result-card-title">ProQOL — Calidad de vida profesional</div><div class="result-sub">Fatiga y satisfacción por compasión</div>
+      <div class="score-row"><span class="score-label">Satisfacción (CS)</span><div class="score-bar-wrap"><div class="score-bar bar-green" style="width:${pq.cs}%"></div></div><span class="score-val" style="color:#3a7a3a">${pq.cs}%</span></div>
+      <div class="score-row"><span class="score-label">Burnout</span><div class="score-bar-wrap"><div class="score-bar ${pq.bo > 60 ? 'bar-red' : pq.bo > 35 ? 'bar-amber' : 'bar-green'}" style="width:${pq.bo}%"></div></div><span class="score-val">${pq.bo}%</span></div>
+      <div class="score-row"><span class="score-label">Estrés traumático (STS)</span><div class="score-bar-wrap"><div class="score-bar ${pq.sts > 60 ? 'bar-red' : pq.sts > 35 ? 'bar-amber' : 'bar-green'}" style="width:${pq.sts}%"></div></div><span class="score-val">${pq.sts}%</span></div>
     </div>
-
     <div class="result-card">
-      <div class="result-card-title">MBI — Inventario de Burnout de Maslach</div>
-      <div class="result-sub">Tres dimensiones del desgaste laboral</div>
-      <div class="score-row">
-        <span class="score-label">Agot. emocional ${riskBadge(mbi.aeRisk)}</span>
-        <div class="score-bar-wrap"><div class="score-bar ${riskColor(mbi.aeRisk)}" style="width:${mbi.ae}%"></div></div>
-        <span class="score-val">${mbi.aeRaw}/6</span>
-      </div>
-      <div class="score-row">
-        <span class="score-label">Despersonalización ${riskBadge(mbi.dpRisk)}</span>
-        <div class="score-bar-wrap"><div class="score-bar ${riskColor(mbi.dpRisk)}" style="width:${mbi.dp}%"></div></div>
-        <span class="score-val">${mbi.dpRaw}/6</span>
-      </div>
-      <div class="score-row">
-        <span class="score-label">Baja realización ${riskBadge(mbi.rpRisk)}</span>
-        <div class="score-bar-wrap"><div class="score-bar ${riskColor(mbi.rpRisk)}" style="width:${mbi.rp}%"></div></div>
-        <span class="score-val">${mbi.rpRaw}/6</span>
-      </div>
+      <div class="result-card-title">MBI — Inventario de Burnout de Maslach</div><div class="result-sub">Tres dimensiones del desgaste laboral</div>
+      <div class="score-row"><span class="score-label">Agot. emocional ${riskBadge(mbi.aeRisk)}</span><div class="score-bar-wrap"><div class="score-bar ${riskColor(mbi.aeRisk)}" style="width:${mbi.ae}%"></div></div><span class="score-val">${mbi.aeRaw}/6</span></div>
+      <div class="score-row"><span class="score-label">Despersonalización ${riskBadge(mbi.dpRisk)}</span><div class="score-bar-wrap"><div class="score-bar ${riskColor(mbi.dpRisk)}" style="width:${mbi.dp}%"></div></div><span class="score-val">${mbi.dpRaw}/6</span></div>
+      <div class="score-row"><span class="score-label">Baja realización ${riskBadge(mbi.rpRisk)}</span><div class="score-bar-wrap"><div class="score-bar ${riskColor(mbi.rpRisk)}" style="width:${mbi.rp}%"></div></div><span class="score-val">${mbi.rpRaw}/6</span></div>
     </div>
-
     <div class="result-card">
-      <div class="result-card-title">DASS-21 — Bienestar emocional</div>
-      <div class="result-sub">Depresión, ansiedad y estrés</div>
-      <div class="score-row">
-        <span class="score-label">Depresión ${riskBadge(dass.dRisk)}</span>
-        <div class="score-bar-wrap"><div class="score-bar ${riskColor(dass.dRisk)}" style="width:${dass.d}%"></div></div>
-        <span class="score-val">${dass.dRaw}</span>
-      </div>
-      <div class="score-row">
-        <span class="score-label">Ansiedad ${riskBadge(dass.anRisk)}</span>
-        <div class="score-bar-wrap"><div class="score-bar ${riskColor(dass.anRisk)}" style="width:${dass.an}%"></div></div>
-        <span class="score-val">${dass.anRaw}</span>
-      </div>
-      <div class="score-row">
-        <span class="score-label">Estrés ${riskBadge(dass.sRisk)}</span>
-        <div class="score-bar-wrap"><div class="score-bar ${riskColor(dass.sRisk)}" style="width:${dass.s}%"></div></div>
-        <span class="score-val">${dass.sRaw}</span>
-      </div>
+      <div class="result-card-title">DASS-21 — Bienestar emocional</div><div class="result-sub">Depresión, ansiedad y estrés</div>
+      <div class="score-row"><span class="score-label">Depresión ${riskBadge(dass.dRisk)}</span><div class="score-bar-wrap"><div class="score-bar ${riskColor(dass.dRisk)}" style="width:${dass.d}%"></div></div><span class="score-val">${dass.dRaw}</span></div>
+      <div class="score-row"><span class="score-label">Ansiedad ${riskBadge(dass.anRisk)}</span><div class="score-bar-wrap"><div class="score-bar ${riskColor(dass.anRisk)}" style="width:${dass.an}%"></div></div><span class="score-val">${dass.anRaw}</span></div>
+      <div class="score-row"><span class="score-label">Estrés ${riskBadge(dass.sRisk)}</span><div class="score-bar-wrap"><div class="score-bar ${riskColor(dass.sRisk)}" style="width:${dass.s}%"></div></div><span class="score-val">${dass.sRaw}</span></div>
     </div>`;
 
-            if (risk) {
-                html += `<div class="alert-card">
-      <div class="alert-title">Algunos indicadores merecen atención</div>
-      <p class="alert-text">Tus puntajes sugieren que podrías estar experimentando un nivel de desgaste que puede interferir en tu bienestar o en tu capacidad de cuidar. Una asesoría psicológica breve puede ayudarte a evaluar si necesitas apoyo especializado.</p>
-      <a class="btn-encuadrado" href="https://encuadrado.com/p/rodrigo-figueroa/s/asesoria-psicologica-o-primeros-auxilios-psicologicos-para-tutores-y-voluntarios-fundacion-bunny-lovers" target="_blank" rel="noopener">Agendar asesoría gratuita con Rodrigo →</a>
-    </div>`;
-            } else {
-                html += `<div class="ok-card">
-      <div class="ok-title">Tus puntajes están dentro del rango esperado</div>
-      <p class="ok-text">No se detectan indicadores de riesgo elevado por el momento. Recuerda que el autocuidado es preventivo: mantener hábitos de bienestar te ayudará a sostener tu compromiso con Bunny Lovers. Si en algún momento sientes que algo cambia, puedes volver a completar este tamizaje o consultar directamente.</p>
-    </div>`;
+            if (recs.length > 0) {
+                html += `<div class="result-card"><div class="result-card-title">Recomendaciones personalizadas</div><div class="result-sub">Basadas en tus puntajes</div>`;
+                recs.forEach(rec => { html += `<p style="font-size:13px;color:#4a4540;line-height:1.7;margin-bottom:10px;padding-left:12px;border-left:3px solid var(--sage-light);">${rec}</p>`; });
+                html += `</div>`;
             }
 
-            html += `<div class="disclaimer">Este tamizaje no reemplaza una evaluación clínica profesional. Los resultados son orientativos. Si tienes dudas sobre tu bienestar emocional, consulta con un profesional de salud mental.</div>
-    <button class="btn-restart" onclick="restartApp()">Volver a comenzar</button>
+            if (risk) {
+                html += `<div class="alert-card"><div class="alert-title">Algunos indicadores merecen atención</div><p class="alert-text">Tus puntajes sugieren que podrías estar experimentando un nivel de desgaste que puede interferir en tu bienestar. Una asesoría psicológica breve puede ayudarte a evaluar si necesitas apoyo especializado.</p></div>`;
+            } else {
+                html += `<div class="ok-card"><div class="ok-title">Tus puntajes están dentro del rango esperado</div><p class="ok-text">No se detectan indicadores de riesgo elevado. Mantén tus hábitos de autocuidado. Si en algún momento sientes que algo cambia, puedes volver a completar este tamizaje.</p></div>`;
+            }
+
+            html += `<div class="action-btns">
+    <button class="btn-pdf" onclick="generatePDF()">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="1" width="9" height="12" rx="1.5" stroke="#a0584a" stroke-width="1.3"/><path d="M5 5h5M5 7.5h5M5 10h3" stroke="#a0584a" stroke-width="1.1" stroke-linecap="round"/></svg>
+      Descargar reporte PDF
+    </button>
+    <a class="btn-encuadrado" href="${ENCUADRADO_URL}" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="3" width="13" height="11" rx="1.5" stroke="white" stroke-width="1.3"/><path d="M5 3V2a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1" stroke="white" stroke-width="1.3"/><path d="M8 7v4M6 9h4" stroke="white" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Agendar asesoría psicológica gratuita
+    </a>
+  </div>
+  <div class="disclaimer">Este tamizaje no reemplaza una evaluación clínica profesional. Rodrigo Figueroa — Psicólogo Clínico — rfigueroas.ps@gmail.com</div>
+  <button class="btn-restart" onclick="restartApp()">Volver a comenzar</button>
   </div>`;
             return html;
         }
 
         function render() {
-            const sec = SECTIONS[state.section];
-            const prog = getProgress();
+            const sec = SECTIONS[state.section], prog = getProgress();
             let html = '';
-
-            if (sec.type === 'intro') {
-                html = renderIntro();
-            } else if (sec.type === 'instrument') {
-                html = `<div class="progress-bar-wrap">
-      <div class="progress-label"><span>Progreso</span><span>${prog}%</span></div>
-      <div class="progress-track"><div class="progress-fill" style="width:${prog}%"></div></div>
-    </div>` + renderInstrument(sec);
-            } else {
-                html = `<div class="progress-bar-wrap">
-      <div class="progress-label"><span>Completado</span><span>100%</span></div>
-      <div class="progress-track"><div class="progress-fill" style="width:100%"></div></div>
-    </div>` + renderResults();
-            }
-
+            if (sec.type === 'intro') { html = renderIntro(); }
+            else if (sec.type === 'instrument') { html = `<div class="progress-bar-wrap"><div class="progress-label"><span>Progreso</span><span>${prog}%</span></div><div class="progress-track"><div class="progress-fill" style="width:${prog}%"></div></div></div>` + renderInstrument(sec); }
+            else { html = `<div class="progress-bar-wrap"><div class="progress-label"><span>Completado</span><span>100%</span></div><div class="progress-track"><div class="progress-fill" style="width:100%"></div></div></div>` + renderResults(); }
             document.getElementById('main-content').innerHTML = html;
             window.scrollTo(0, 0);
         }
 
-        function answer(sec, idx, val) {
-            state.answers[sec][idx] = val;
-            const scrollY = window.scrollY;
-            render();
-            window.scrollTo(0, scrollY);
-        }
+        function answer(sec, idx, val) { state.answers[sec][idx] = val; const sy = window.scrollY; render(); window.scrollTo(0, sy); }
         function nextSection() { if (state.section < SECTIONS.length - 1) { state.section++; render(); } }
         function prevSection() { if (state.section > 0) { state.section--; render(); } }
-        function restartApp() { state = { section: 0, answers: { proqol: {}, mbi: {}, dass: {} } }; render(); }
+        function restartApp() { state = { section: 0, answers: { proqol: {}, mbi: {}, dass: {} }, userName: '', userRole: '' }; render(); }
 
         render();
     </script>
